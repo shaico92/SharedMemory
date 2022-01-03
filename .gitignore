@@ -1,2 +1,5 @@
 ./x64
-./x64/**
+./CA1/x64/**
+./CA2/x64/**
+./SharedMemoryDll/x64/**
+./SharedMemoryWriter/x64/**
