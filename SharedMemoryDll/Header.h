@@ -131,7 +131,7 @@ public:
         }
     };
 
-	void   AccessSharedMemory(const std::string theNameForMem);
+	void   AccessSharedMemory( std::string theNameForMem);
 	char* GetBufferStart();
 	void  setBufferSize(int size_);
 	char* GetBuffer();

@@ -8,7 +8,7 @@ int main()
 {
 
     MemoryManager mem;
-    mem.AccessSharedMemory("Global\\fff");
+    mem.AccessSharedMemory("fff");
 
     auto pointerFromSharedMem = mem.printObjectsOfTypePtr<WithChars>(WithChars_t);
 

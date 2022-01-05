@@ -15,7 +15,7 @@ int main()
 {
 
     MemoryManager mem;
-    mem.AccessSharedMemory("Global\\fff");
+    mem.AccessSharedMemory("fff");
 
 
 
@@ -42,7 +42,7 @@ int main()
 
      WithChars wc;
      wc.id = 143;
-     string name = "hello,myname is shai";
+  
      strcpy_s(wc.name, 100, name.c_str());
 
 
@@ -61,10 +61,7 @@ int main()
     auto tff_ptr = mem.printObjectsOfTypePtr<WithChars>(Types::WithChars_t);
    
     auto tfk = mem.printObjectsOfType<Wawa2>(Types::Wawa_2);
-    //while (true)
-    //{
-
-    //}
+ 
 
 }
 

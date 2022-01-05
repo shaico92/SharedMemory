@@ -19,7 +19,7 @@ int main()
     foo(214);
     MemoryManager mem;
     mem.setBufferSize(1000);
-    mem.AccessSharedMemory("Global\\fff");
+    mem.AccessSharedMemory("fff");
 
     //mem.GetBuffer();
 

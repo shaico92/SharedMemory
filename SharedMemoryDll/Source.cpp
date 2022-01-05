@@ -1,121 +1,21 @@
 #include "pch.h"
 #include "Header.h"
 
-//template <typename T>
-//void MemoryManager::AddToBuffer(T* theType, Types type, unsigned int Iterations) {
-//    //char* data_;
-//
-//    //data_ = (char*)MapViewOfFile(mappHandle,   // handle to map object
-//    //    FILE_MAP_ALL_ACCESS, // read/write permission
-//    //    0,
-//    //    0,
-//    //    Buffer);
-//
-//
-//    //if (data_ == NULL)
-//    //{
-//
-//    //    _tprintf(TEXT("Could not map view of file (%d).\n"),
-//    //        GetLastError());
-//
-//    //    CloseHandle(mappHandle);
-//
-//
-//    //}
-//    //memcpy_s(&Buffer, sizeof(int), data_, sizeof(int));
-//
-//
-//    //checking the size of the array passed
-//
-//
-//
-//
-//    for (size_t i = 0; i < Iterations; i++)
-//    {
-//        /* memcpy_s(GetBuffer(), Buffer, &type, sizeof(type));
-//
-//
-//         memcpy_s(GetBuffer(), Buffer, &theType[i], sizeof(theType));*/
-//        AddToBuffer<T>(theType[i], type);
-//
-//        ++theType;
-//    }
-//
-//    //memcpy_s(GetBuffer(), Buffer, &type, sizeof(type));
-//
-//
-//    //memcpy_s(GetBuffer(), Buffer, &theType, sizeof(theType));
-//}
 
-
-//template <typename T>
-//
-//void MemoryManager::AddToBuffer(T& theType, Types type)
-//{
-//
-//    char* data_;
-//
-//    data_ = (char*)MapViewOfFile(mappHandle,   // handle to map object
-//        FILE_MAP_ALL_ACCESS, // read/write permission
-//        0,
-//        0,
-//        Buffer);
-//
-//
-//    if (data_ == NULL)
-//    {
-//
-//        _tprintf(TEXT("Could not map view of file (%d).\n"),
-//            GetLastError());
-//
-//        CloseHandle(mappHandle);
-//
-//
-//    }
-//    memcpy_s(&Buffer, sizeof(int), data_, sizeof(int));
-//
-//    char prefix = 's';
-//    char suffix = 'e';
-//
-//    char forTest = ' ';
-//    Types t = Types::invalid;
-//    T* ptr;
-//    memcpy_s(GetBuffer(), sizeof(char), &prefix, sizeof(char));
-//    //test if allocated 's'
-//  //  memcpy_s(&forTest, sizeof(char), GetBuffer() - sizeof(char), sizeof(char));
-//    UnAllocatedDataPtr += sizeof(char);
-//    memcpy_s(GetBuffer(), sizeof(Types), &type, sizeof(Types));
-//    //test if allocated 'Types Enum'
-//    UnAllocatedDataPtr += sizeof(Types);
-//    // memcpy_s(&t, sizeof(Types), GetBuffer() - sizeof(Types), sizeof(Types));
-//     //test if allocated 'T'
-//
-//    memcpy_s(GetBuffer(), sizeof(theType), &theType, sizeof(theType));
-//    UnAllocatedDataPtr += sizeof(theType);
-//
-//    //test if allocated 'e'
-//    memcpy_s(GetBuffer(), sizeof(char), &suffix, sizeof(char));
-//
-//    UnAllocatedDataPtr += sizeof(char);
-//
-//
-//
-//}
-
-void MemoryManager::AccessSharedMemory(const std::string theNameForMem) {
+void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
 
 
     bool dataAccessed = true;
 
 
 
-    char theNameAsBuffer[100];// = new char[theNameForMem.length()];
+    char theNameAsBuffer[100];
 
     TCHAR ManagedMemoryName[100];
 
 
     size_t newsize = strlen(theNameAsBuffer) + 1;
-
+    theNameForMem = "Local/" + theNameForMem;
 
     strcpy_s(theNameAsBuffer, 100, theNameForMem.c_str());
 
