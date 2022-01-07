@@ -88,37 +88,38 @@ void SharedMemoryStuff(T type) {
         //NoVal
         ptrOfBuffer[i] = empty;
     }
-    T typo_;
+    S typo_;
+    typo_.id = -666;
+    int i = 0;
+    char** Address = &ptrOfBuffer;
     memcpy_s(ptrOfBuffer, sizeof(T), &type, sizeof(T));
 
+    
 
-    memcpy_s(&typo_, sizeof(T), ptrOfBuffer, sizeof(T));
+  
 
-    auto Address = &ptrOfBuffer;
-    auto EndAddress = &ptrOfBuffer + sizeof(T);
-
-    //T* s;
-    int i = 0;
     memcpy_s(&AdressesBuffer[i], sizeof(&Address), &Address, sizeof(&Address));
-  
-  
-    //memcpy_s(Data, sizeof(&Address), ptrToBuffer, sizeof(&Address));
     auto s = (T***)AdressesBuffer;
 
-    T* typo = **s;
+    T typo = ***s;
     //Data
-    auto typo_s = (S*)typo;
-    typo_s->id = 314;
+    auto typo_s = typo;
+
     i += sizeof(&Address);
+    ptrOfBuffer += sizeof(T);
+    memcpy_s(ptrOfBuffer, sizeof(T), &typo_, sizeof(T));
+    Address = &ptrOfBuffer;
     memcpy_s(&AdressesBuffer[i], sizeof(&Address), &Address, sizeof(&Address));
-
+  
+  
+   
     
-    
-    auto wherec= &AdressesBuffer[i-sizeof(&Address)];
+    auto sf = (T***)AdressesBuffer;
 
-    auto fs = (T***)wherec;
-
-    T typof = ***fs;
+    T* typov = **sf;
+    //Data
+    auto typo_svc = (S*)typov;
+  
 
 }
 
