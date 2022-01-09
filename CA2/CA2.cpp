@@ -42,25 +42,20 @@ int main()
 
      WithChars wc;
      wc.id = 143;
-  
+     string name = "affff";
      strcpy_s(wc.name, 100, name.c_str());
 
 
-     mem.AddToBuffer<Wawa>(obj, Types::Wawa_);
+     mem.AddToBuffer<Wawa>(obj, Structs_enum::Wawa_);
 
-     mem.AddToBuffer<Wawa>(obj,Types::Wawa_);
+     mem.AddToBuffer<Wawa>(obj, Structs_enum::Wawa_);
 
-     mem.AddToBuffer<WithChars>(wc, Types::WithChars_t);
-     mem.AddToBuffer<Wawa2>(arr, Types::Wawa_2,5);
-     mem.AddToBuffer<Wawa2>(typeTwo, Types::Wawa_2);
-     mem.AddToBuffer<Wawa>(obdj, Types::Wawa_);
-    auto tf= mem.printObjectsOfType<Wawa>( Types::Wawa_);
+     mem.AddToBuffer<WithChars>(wc, Structs_enum::WithChars_t);
+     mem.AddToBuffer<Wawa2>(arr, 5,Structs_enum::Wawa_2);
+     mem.AddToBuffer<Wawa2>(typeTwo, Structs_enum::Wawa_2);
+     mem.AddToBuffer<Wawa>(obdj, Structs_enum::Wawa_);
+    auto tf= mem.GetAllElements<Wawa>(Structs_enum::Wawa_);
 
-    auto tff = mem.printObjectsOfType<WithChars>(Types::WithChars_t);
-
-    auto tff_ptr = mem.printObjectsOfTypePtr<WithChars>(Types::WithChars_t);
-   
-    auto tfk = mem.printObjectsOfType<Wawa2>(Types::Wawa_2);
  
 
 }

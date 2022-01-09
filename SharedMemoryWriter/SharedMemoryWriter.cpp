@@ -10,13 +10,13 @@ int main()
     MemoryManager mem;
     mem.AccessSharedMemory("fff");
 
-    auto pointerFromSharedMem = mem.printObjectsOfTypePtr<WithChars>(WithChars_t);
+    //auto pointerFromSharedMem = mem.printObjectsOfTypePtr<WithChars>(WithChars_t);
 
-    for (size_t i = 0; i < pointerFromSharedMem.size(); i++)
-    {
-         pointerFromSharedMem.at(i)->id=4208;
-         
-    }
+    //for (size_t i = 0; i < pointerFromSharedMem.size(); i++)
+    //{
+    //     pointerFromSharedMem.at(i)->id=4208;
+    //     
+    //}
 
     
 }

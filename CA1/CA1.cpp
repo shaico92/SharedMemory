@@ -12,13 +12,9 @@ void my_int_func(int x)
 int main()
 {
     
-    void (*foo)(int);
-    /* the ampersand is actually optional */
-    foo = &my_int_func;
-    
-    foo(214);
+
     MemoryManager mem;
-    mem.setBufferSize(1000);
+
     mem.AccessSharedMemory("fff");
 
     //mem.GetBuffer();

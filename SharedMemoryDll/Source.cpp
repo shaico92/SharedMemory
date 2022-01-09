@@ -15,7 +15,7 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
 
 
     size_t newsize = strlen(theNameAsBuffer) + 1;
-    theNameForMem = "Local/" + theNameForMem;
+    theNameForMem = "Local/M" + theNameForMem;
 
     strcpy_s(theNameAsBuffer, 100, theNameForMem.c_str());
 
@@ -27,39 +27,85 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
 
     }
 
+    //this is Const
+    TCHAR AddressBuffer[] = TEXT("Local/MyMap");
+    for (size_t i = 0; i < 100 && AddressBuffer[i] != '\0'; i++)
+    {
+        
+        AddressBufferName[i] = AddressBuffer[i];
 
-    HANDLE hMapFile = NULL;
-    char* data_;
 
-    hMapFile = OpenFileMapping(
+    }
+
+    
+
+
+
+
+
+
+
+    char* AddressBuffer_;
+    char* DataBuffer_;
+    HANDLE   hMapFile1 = OpenFileMapping(
         FILE_MAP_ALL_ACCESS,   // read/write access
         FALSE,                 // do not inherit the name
-        ManagedMemoryName);
+        AddressBufferName);
+
+    HANDLE  hMapFile2 = OpenFileMapping(
+        FILE_MAP_ALL_ACCESS,   // read/write access
+        FALSE,                 // do not inherit the name
+        MemoryName);
+
+
+
 
     bool creator = false;
 
-    if (hMapFile == NULL)
+    if (hMapFile1 == NULL|| hMapFile2 == NULL)
     {
-        std::cout << "The Shared Memory Name could not be found  will now create a new file mapping to access it" << std::endl;
-        hMapFile = CreateFileMapping(
+        std::cout << "The Shared Memory Name could not be found  will now create a new 2 file  mapping to access it" << std::endl;
+        hMapFile2 = CreateFileMapping(
             INVALID_HANDLE_VALUE,    // use paging file
             NULL,                    // default security
             PAGE_READWRITE,          // read/write access
             0,                       // maximum object size (high-order DWORD)
-            Buffer + sizeof(int),                // maximum object size (low-order DWORD)
-            ManagedMemoryName);                 // name of mapping object
+    /*DataBuffer*/        SHARED_BUFFER_DATA,                // maximum object size (low-order DWORD)
+            MemoryName); 
 
-        std::cout << "im the createor i will set the buffer size" << std::endl;
-        creator = true;
-
-
-        if (hMapFile == NULL)
+        if (hMapFile2 == NULL)
         {
             dataAccessed = false;
             _tprintf(TEXT("Could not create file mapping object (%d).\n"),
                 GetLastError());
 
         }
+        else {
+            std::cout << "The Shared Memory :"<< MemoryName<<" was created" << std::endl;
+        }
+        hMapFile1 = CreateFileMapping(
+            INVALID_HANDLE_VALUE,    // use paging file
+            NULL,                    // default security
+            PAGE_READWRITE,          // read/write access
+            0,                       // maximum object size (high-order DWORD)
+            SHARED_ADDRESS_BUFFER,                // maximum object size (low-order DWORD)
+            AddressBufferName);
+        if (hMapFile1 == NULL)
+        {
+            dataAccessed = false;
+            _tprintf(TEXT("Could not create file mapping object (%d).\n"),
+                GetLastError());
+
+        }
+        else {
+            std::cout << "The Shared Memory :" << AddressBufferName << " was created" << std::endl;
+        }
+        // name of mapping object
+
+        std::cout << "im the createor i will set the buffer size" << std::endl;
+        creator = true;
+
+
     }
 
 
@@ -68,71 +114,47 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
 
 
 
-    data_ = (char*)MapViewOfFile(hMapFile,   // handle to map object
+    DataBuffer_ = (char*)MapViewOfFile(hMapFile2,   // handle to map object
         FILE_MAP_ALL_ACCESS, // read/write permission
         0,
         0,
-        Buffer);
+        SHARED_BUFFER_DATA);
 
 
-    if (data_ == NULL)
+    if (DataBuffer_ == NULL)
     {
         dataAccessed = false;
         _tprintf(TEXT("Could not map view of file (%d).\n"),
             GetLastError());
 
-        CloseHandle(hMapFile);
+        CloseHandle(hMapFile2);
 
 
     }
-    mappHandle = hMapFile;
+    AddressBuffer_ = (char*)MapViewOfFile(hMapFile1,   // handle to map object
+        FILE_MAP_ALL_ACCESS, // read/write permission
+        0,
+        0,
+        SHARED_ADDRESS_BUFFER);
 
 
-    char* pBufCopy = data_;
-
-    memcpy_s(pBufCopy, Buffer, data_, Buffer);
-    int sizeAlocated = 0;
-    if (creator)
+    if (AddressBuffer_ == NULL)
     {
-        char Unallocated = '-';
-
-
-        ++pBufCopy;
-        int pos = 0;
-        int tested = 0;
-        for (size_t i = 0; i < Buffer; i++)
-        {
-            memcpy_s(&pBufCopy[pos], sizeof(char), &Unallocated, sizeof(char));
-
-
-            memcpy_s(&tested, sizeof(char), &pBufCopy[pos], sizeof(char));
-            //  std::cout << "int is " << tested << std::endl;
-
-
-
-            pos += sizeof(char);
-
-        }
-        //writing size of buffer;
-        memcpy_s(pBufCopy, sizeof(int), &Buffer, sizeof(int));
-
-
-
-        memcpy_s(data_, Buffer, pBufCopy, Buffer);
-        // delete[] pBufCopy;
-       //  memcpy_s(pBufCopy, Buffer - (sizeof(unsigned int)), &Unallocated, sizeof(unsigned int));
-
-
-    }
-
-
-
-    memcpy_s(&sizeAlocated, sizeof(int), data_, sizeof(int));
-    if (sizeAlocated < 1 && !creator)
-    {
-        std::cout << "Data Was not set by the creator of the sharedmemory segment" << std::endl;
         dataAccessed = false;
+        _tprintf(TEXT("Could not map view of file (%d).\n"),
+            GetLastError());
+
+        CloseHandle(hMapFile2);
+
+
     }
+
+
+
+   
+
+
+  
 
 
 
@@ -145,220 +167,7 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
 }
 
 
-char* MemoryManager::GetBufferStart() {
-    char* data_;
-
-    data_ = (char*)MapViewOfFile(mappHandle,   // handle to map object
-        FILE_MAP_ALL_ACCESS, // read/write permission
-        0,
-        0,
-        Buffer);
-
-
-    if (data_ == NULL)
-    {
-
-        _tprintf(TEXT("Could not map view of file (%d).\n"),
-            GetLastError());
-
-        CloseHandle(mappHandle);
-
-
-    }
-    return data_;
-}
-
-char* MemoryManager::GetBuffer() {
-    char* data_;
-
-    data_ = (char*)MapViewOfFile(mappHandle,   // handle to map object
-        FILE_MAP_ALL_ACCESS, // read/write permission
-        0,
-        0,
-        Buffer);
-
-
-    if (data_ == NULL)
-    {
-
-        _tprintf(TEXT("Could not map view of file (%d).\n"),
-            GetLastError());
-
-        CloseHandle(mappHandle);
-
-
-    }
 
 
 
 
-
-
-    memcpy_s(&Buffer, sizeof(int), data_, sizeof(int));
-
-    char emptyMemory = '-';
-    int pos = 0;
-    const char memoryNone = '-';
-    pos += sizeof(int);
-
-
-    //if (NULL != UnAllocatedDataPtr)
-    //{
-    //    return UnAllocatedDataPtr;
-    //}
-    SizeToCheckForAllocation = sizeof(char) + sizeof(Types) + SizeOfCurrentType + sizeof(char);
-
-    if (NULL!= UnAllocatedDataPtr)
-    {
-        return UnAllocatedDataPtr;
-    }
-
-
-    for (size_t i = 0; i < Buffer; i++)
-    {
-        
-        memcpy_s(&emptyMemory, sizeof(char), &data_[pos], sizeof(char));
-        //     std::cout << emptyMemory << std::endl;
-        //std::cout << memcmp(&emptyMemory, &memoryNone, sizeof(int)) << endl;
-        int tempPosition = pos;
-        if (emptyMemory == memoryNone)
-        {
-            for (size_t i = 0; i < SizeToCheckForAllocation; i++)
-            {
-                char current = '-';
-                memcpy_s(&current, sizeof(char), &data_[tempPosition], sizeof(char));
-
-                if (current != '-')
-                {
-                    cout << " memory" << &data_[pos] << " is not valid as empty: " << data_[pos] << endl;
-                }
-                tempPosition += sizeof(char);
-            }
-
-
-            std::cout << &emptyMemory << ':'<<pos << std::endl;
-            UnAllocatedDataPtr = &data_[pos];
-            return UnAllocatedDataPtr;
-        }
-
-
-        pos += sizeof(char);
-    }
-    return NULL;
-
-
-}
-
-//template <typename T>
-//char* MemoryManager::validBufferFormat(char* pbuff, Types typeWanted, bool& IsParsable) {
-//
-//    //booleans
-//
-//
-//    IsParsable = false;
-//    //check if start of object with char 's'
-//    Types temp = Types::invalid;
-//
-//    char Nll = '\0';
-//    bool matchingEnums = temp == typeWanted;
-//    bool matchEndOfObject = Nll == 'e';
-//    bool matchStartOfObject = Nll == 's';
-//    //check if start of object with char 's'
-//    memcpy_s(&Nll, sizeof(char), pbuff, sizeof(char));
-//    if (matchStartOfObject)
-//    {
-//        cout << "starting object" << endl;
-//
-//        pbuff += sizeof(char);
-//    }
-//    //check if enum is in object 
-//    memcpy_s(&temp, sizeof(Types), pbuff, sizeof(Types));
-//    if (matchingEnums)
-//    {
-//        cout << "getting enum object" << temp << endl;
-//
-//        pbuff += sizeof(Types);
-//    }
-//    //check struct  object 
-//
-//    T* someType = (T*)pbuff;
-//    pbuff += sizeof(T);
-//
-//    //check struct  object ends with 'e'
-//    memcpy_s(&Nll, sizeof(char), pbuff, sizeof(char));
-//    if (matchEndOfObject)
-//    {
-//        cout << "getting  object end" << endl;
-//
-//        pbuff -= sizeof(T);
-//        // pbuff += sizeof(char);
-//    }
-//
-//    //returning charBuffer to the point of the struct
-//
-//    IsParsable = matchStartOfObject && matchEndOfObject && matchingEnums;
-//    return pbuff;
-//}
-//
-//template <typename T>
-//std::vector<T> MemoryManager::printObjectsOfType(Types type)
-//
-//{
-//    std::vector<T> allPtrs;
-//
-//    char* pbuff = GetBufferStart();
-//    Types temp = Types::invalid;
-//    memcpy_s(&Buffer, sizeof(int), pbuff, sizeof(int));
-//    pbuff += sizeof(int);
-//    for (int i = 0;i < Buffer; ++i)
-//    {
-//
-//
-//
-//        bool parsed = false;
-//        validBufferFormat<T>(pbuff, type, parsed);
-//        if (parsed)
-//        {
-//            pbuff = validBufferFormat<T>(pbuff, type, parsed);
-//            T* someType = (T*)pbuff;
-//            allPtrs.push_back(*someType);
-//        }
-//
-//        //   pbuff +=sizeof(char);
-//
-//
-//
-//       //    memcpy_s(&temp, sizeof(Types), pbuff, sizeof(Types));
-//       //    if (temp==type)
-//       //    {
-//
-//       ///*        std::cout << "about to touch a object" <<temp<< std::endl;
-//       //        
-//       //       
-//       //        pbuff += sizeof(Types);
-//
-//
-//
-//       //        T* someType = (T*)pbuff;
-//       //        allPtrs.push_back(*someType);*/
-//       //      
-//       //    }
-//          /* pbuff+=sizeof(int);*/
-//    }
-//
-//
-//    //    memcpy_s(&someType, sizeof(theType), pbuff, sizeof(theType));
-//    return allPtrs;
-//
-//}
-void  MemoryManager::setBufferSize(int size_)
-{
-    Buffer = size_;
-}
-
-
-
-
-
-
-MemoryManager* GetTheMemManager() { return new MemoryManager(); }
