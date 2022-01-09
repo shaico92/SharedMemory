@@ -98,18 +98,19 @@ void SharedMemoryStuff(T type) {
 
   
 
-    memcpy_s(&AdressesBuffer[i], sizeof(&Address), &Address, sizeof(&Address));
+    memcpy_s(AdressesBuffer, sizeof(&Address), &Address, sizeof(&Address));
     auto s = (T***)AdressesBuffer;
 
     T typo = ***s;
     //Data
     auto typo_s = typo;
 
-    i += sizeof(&Address);
+
     ptrOfBuffer += sizeof(T);
     memcpy_s(ptrOfBuffer, sizeof(T), &typo_, sizeof(T));
-    Address = &ptrOfBuffer;
-    memcpy_s(&AdressesBuffer[i], sizeof(&Address), &Address, sizeof(&Address));
+    
+    //probably remove & from &Address
+    memcpy_s(AdressesBuffer, sizeof(&Address), &Address, sizeof(&Address));
   
   
    
@@ -119,8 +120,16 @@ void SharedMemoryStuff(T type) {
     T* typov = **sf;
     //Data
     auto typo_svc = (S*)typov;
-  
-
+    //ptrOfBuffer -= sizeof(T);
+    
+    //AdressesBuffer -= sizeof(&Address);
+    while (true)
+    {
+        char* ptr = new char[5000];
+        memcpy_s(ptr, 8, AdressesBuffer, 8);
+        auto sff = (T***)ptr;
+        ptrOfBuffer -= sizeof(T);
+    }
 }
 
 int main()
