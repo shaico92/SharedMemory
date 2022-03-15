@@ -23,7 +23,7 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
     for (size_t i = 0; i < 100 && theNameAsBuffer[i] != '\0'; i++)
     {
         ManagedMemoryName[i] = theNameAsBuffer[i];
-        MemoryName[i] = theNameAsBuffer[i];
+        SHARED_::MemoryName[i] = theNameAsBuffer[i];
 
     }
 
@@ -32,7 +32,7 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
     for (size_t i = 0; i < 100 && AddressBuffer[i] != '\0'; i++)
     {
         
-        AddressBufferName[i] = AddressBuffer[i];
+        SHARED_::AddressName[i] = AddressBuffer[i];
 
 
     }
@@ -47,33 +47,33 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
 
     char* AddressBuffer_;
     char* DataBuffer_;
-    HANDLE   hMapFile1 = OpenFileMapping(
+    SHARED_::hMapFile1 = OpenFileMapping(
         FILE_MAP_ALL_ACCESS,   // read/write access
         FALSE,                 // do not inherit the name
-        AddressBufferName);
+        SHARED_::AddressName);
 
-    HANDLE  hMapFile2 = OpenFileMapping(
+    SHARED_::hMapFile2 = OpenFileMapping(
         FILE_MAP_ALL_ACCESS,   // read/write access
         FALSE,                 // do not inherit the name
-        MemoryName);
+        SHARED_::MemoryName);
 
 
 
 
     bool creator = false;
 
-    if (hMapFile1 == NULL|| hMapFile2 == NULL)
+    if (SHARED_::hMapFile2 == NULL|| SHARED_::hMapFile1 == NULL)
     {
         std::cout << "The Shared Memory Name could not be found  will now create a new 2 file  mapping to access it" << std::endl;
-        hMapFile2 = CreateFileMapping(
+        SHARED_::hMapFile2 = CreateFileMapping(
             INVALID_HANDLE_VALUE,    // use paging file
             NULL,                    // default security
             PAGE_READWRITE,          // read/write access
             0,                       // maximum object size (high-order DWORD)
-    /*DataBuffer*/        SHARED_BUFFER_DATA,                // maximum object size (low-order DWORD)
-            MemoryName); 
+            SuperSize,              // maximum object size (low-order DWORD)
+            SHARED_::MemoryName);
 
-        if (hMapFile2 == NULL)
+        if (SHARED_::hMapFile2 == NULL)
         {
             dataAccessed = false;
             _tprintf(TEXT("Could not create file mapping object (%d).\n"),
@@ -81,16 +81,16 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
 
         }
         else {
-            std::cout << "The Shared Memory :"<< MemoryName<<" was created" << std::endl;
+            std::cout << "The Shared Memory :"<< SHARED_::MemoryName <<" was created" << std::endl;
         }
-        hMapFile1 = CreateFileMapping(
+        SHARED_::hMapFile1 = CreateFileMapping(
             INVALID_HANDLE_VALUE,    // use paging file
             NULL,                    // default security
             PAGE_READWRITE,          // read/write access
             0,                       // maximum object size (high-order DWORD)
-            SHARED_ADDRESS_BUFFER,                // maximum object size (low-order DWORD)
-            AddressBufferName);
-        if (hMapFile1 == NULL)
+            SuperSize  ,            // maximum object size (low-order DWORD)
+            SHARED_::AddressName);
+        if (SHARED_::hMapFile1 == NULL)
         {
             dataAccessed = false;
             _tprintf(TEXT("Could not create file mapping object (%d).\n"),
@@ -98,7 +98,7 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
 
         }
         else {
-            std::cout << "The Shared Memory :" << AddressBufferName << " was created" << std::endl;
+            std::cout << "The Shared Memory :" << SHARED_::AddressName << " was created" << std::endl;
         }
         // name of mapping object
 
@@ -114,11 +114,11 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
 
 
 
-    DataBuffer_ = (char*)MapViewOfFile(hMapFile2,   // handle to map object
+    DataBuffer_ = (char*)MapViewOfFile(SHARED_::hMapFile2,   // handle to map object
         FILE_MAP_ALL_ACCESS, // read/write permission
         0,
         0,
-        SHARED_BUFFER_DATA);
+        SuperSize);
 
 
     if (DataBuffer_ == NULL)
@@ -127,15 +127,21 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
         _tprintf(TEXT("Could not map view of file (%d).\n"),
             GetLastError());
 
-        CloseHandle(hMapFile2);
+        CloseHandle(SHARED_::hMapFile2);
 
 
     }
-    AddressBuffer_ = (char*)MapViewOfFile(hMapFile1,   // handle to map object
+    else {
+        hMapFile2 = SHARED_::hMapFile2;
+
+        memcpy_s(MemoryName, 100, SHARED_::MemoryName, 100);
+    }
+
+    AddressBuffer_ = (char*)MapViewOfFile(SHARED_::hMapFile1,   // handle to map object
         FILE_MAP_ALL_ACCESS, // read/write permission
         0,
         0,
-        SHARED_ADDRESS_BUFFER);
+        SuperSize);
 
 
     if (AddressBuffer_ == NULL)
@@ -147,6 +153,11 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
         CloseHandle(hMapFile2);
 
 
+    }
+    else {
+        hMapFile1 = SHARED_::hMapFile1;
+
+        memcpy_s(MemoryNameAdd, 100, SHARED_::AddressName, 100);
     }
 
 

@@ -25,18 +25,23 @@ enum  EXPORT Structs_enum {
 	Wawa_2=23,
     WithChars_t=15,
 };
-
+namespace SHARED_ {
+    TCHAR MemoryName[100];
+    TCHAR AddressName[100];
+    HANDLE hMapFile1;
+    HANDLE hMapFile2;
+#  define SuperSize  5000
+}
   class EXPORT   MemoryManager
 
 {
 private:
 	int Buffer = 0;
 
-    int SHARED_BUFFER_DATA = 36000;
-    int SHARED_ADDRESS_BUFFER = 360;
-
-	TCHAR MemoryName[100];
-    TCHAR AddressBufferName[100];
+    HANDLE hMapFile1;
+    HANDLE hMapFile2;
+    TCHAR MemoryName[100];
+    TCHAR MemoryNameAdd[100];
  
 
 
@@ -53,31 +58,22 @@ public:
     template<typename T>
     std::vector<T> GetAllElements(Structs_enum typeEnum) {
         std::vector<T> data;
-        HANDLE hMapFile1;
-        HANDLE hMapFile2;
+    
         char* AddressBuffer_;
         char* DataBuffer_;
-        hMapFile1 = OpenFileMapping(
-            FILE_MAP_ALL_ACCESS,   // read/write access
-            FALSE,                 // do not inherit the name
-            AddressBufferName);
-
-        hMapFile2 = OpenFileMapping(
-            FILE_MAP_ALL_ACCESS,   // read/write access
-            FALSE,                 // do not inherit the name
-            MemoryName);
+     
 
         AddressBuffer_ = (char*)MapViewOfFile(hMapFile1,   // handle to map object
             FILE_MAP_ALL_ACCESS, // read/write permission
             0,
             0,
-            SHARED_ADDRESS_BUFFER);
+            SuperSize);
 
         DataBuffer_ = (char*)MapViewOfFile(hMapFile2,   // handle to map object
             FILE_MAP_ALL_ACCESS, // read/write permission
             0,
             0,
-            SHARED_BUFFER_DATA);
+            SuperSize);
 
 
 
@@ -87,7 +83,7 @@ public:
         {
             std::cout << (char)&AddressBuffer_ << std::endl;
             bool aboutToTouch = false;
-            char* ptr = new char[5000];
+            char* ptr = new char[500];
             Structs_enum T_ = Structs_enum::INVALID;
             memcpy_s(&T_, sizeof(Structs_enum), AddressBuffer_, sizeof(Structs_enum));
             if (T_ == typeEnum)
@@ -98,7 +94,7 @@ public:
             }
             AddressBuffer_ += sizeof(Structs_enum);
 
-            memcpy_s(ptr, sizeof(Address), AddressBuffer_, sizeof(Address));
+            memcpy_s(ptr, sizeof(char**), AddressBuffer_, sizeof(char**));
             auto sff = (T**)ptr;
 
 
@@ -152,32 +148,23 @@ public:
 
     template<typename T>
     void AddToBuffer(T TypeData, Structs_enum typeEnum) {
-        HANDLE hMapFile1;
-        HANDLE hMapFile2;
+    
         char* AddressBuffer_;
         char* DataBuffer_;
 
-        hMapFile1 = OpenFileMapping(
-            FILE_MAP_ALL_ACCESS,   // read/write access
-            FALSE,                 // do not inherit the name
-            AddressBufferName);
 
-        hMapFile2 = OpenFileMapping(
-            FILE_MAP_ALL_ACCESS,   // read/write access
-            FALSE,                 // do not inherit the name
-            MemoryName);
 
         AddressBuffer_ = (char*)MapViewOfFile(hMapFile1,   // handle to map object
             FILE_MAP_ALL_ACCESS, // read/write permission
             0,
             0,
-            SHARED_ADDRESS_BUFFER);
+            SuperSize);
 
         DataBuffer_ = (char*)MapViewOfFile(hMapFile2,   // handle to map object
             FILE_MAP_ALL_ACCESS, // read/write permission
             0,
             0,
-           SHARED_BUFFER_DATA);
+            SuperSize);
         char** Address = &DataBuffer_;
 
         //memcpy_s(DataBuffer_, sizeof(T), &TypeData, sizeof(T));
