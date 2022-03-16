@@ -79,11 +79,12 @@ public:
 
         char** Address = &DataBuffer_;
         int i = 0;
-        while (true)
+        char* ptr = new char[8];
+        while (i<SuperSize)
         {
             std::cout << (char)&AddressBuffer_ << std::endl;
             bool aboutToTouch = false;
-            char* ptr = new char[500];
+           
             Structs_enum T_ = Structs_enum::INVALID;
             memcpy_s(&T_, sizeof(Structs_enum), AddressBuffer_, sizeof(Structs_enum));
             if (T_ == typeEnum)
@@ -93,30 +94,29 @@ public:
 
             }
             AddressBuffer_ += sizeof(Structs_enum);
-
+            i += sizeof(Structs_enum);
             memcpy_s(ptr, sizeof(char**), AddressBuffer_, sizeof(char**));
-            auto sff = (T**)ptr;
+            T nodata;
+
+            memcpy_s(&nodata, sizeof(T), ptr, sizeof(T));
+          //  auto sff = (T****)nodata;
 
 
 
 
-            if (NULL == (sff) || NULL == (*sff))
-            {
-                break;
-            }
             if (aboutToTouch)
             {
-                T typov_1 = **sff;
-                data.push_back(typov_1);
+             //   T typov_1 = ****sff;
+             //   data.push_back(typov_1);
             }
 
 
 
 
 
-            AddressBuffer_ += sizeof(Address);
+            AddressBuffer_ += sizeof(char**);
 
-
+            i += sizeof(char**);
 
 
             //ptrOfBuffer -= sizeof(T);
@@ -176,22 +176,23 @@ public:
         }
         char* emptyData;
         char** Address_;
+        char* ptr = new char[sizeof(char**)];
         while (true)
         {
             std::cout << (char)&AddressBuffer_ << std::endl;
 
-            char* ptr = new char[5000];
+            
             bool aboutToTouch = false;
 
 
 
 
             memcpy_s(ptr, sizeof(Address_), AddressBuffer_, sizeof(Address_));
-            auto sff = (T***)ptr;
-            if (NULL == (*sff))
+            
+            if ('\0' == (*ptr))
             {
                 emptyData = ptr;
-                Address_ = &emptyData;
+               
                 break;
             }
 
@@ -200,15 +201,54 @@ public:
 
             AddressBuffer_ += sizeof(Structs_enum);
             AddressBuffer_ += sizeof(Address_);
+           
             //ptrOfBuffer -= sizeof(T);
         }
         //memcpy_s(emptyData, sizeof(Structs_enum), &typeEnum, sizeof(Structs_enum));
 
 
         memcpy_s(emptyData, sizeof(T), &TypeData, sizeof(T));
+        memcpy_s(DataBuffer_, sizeof(T), &emptyData, sizeof(T));
         memcpy_s(AddressBuffer_, sizeof(Structs_enum), &typeEnum, sizeof(Structs_enum));
         AddressBuffer_ += sizeof(Structs_enum);
-        memcpy_s(AddressBuffer_, sizeof(Address_), Address_, sizeof(Address_));
+        memcpy_s(AddressBuffer_, sizeof(Address), &Address, sizeof(Address));
+
+
+        
+        char* cf = new char[600];
+        memcpy_s(cf, sizeof(Address), AddressBuffer_, sizeof(Address));
+    
+        
+      
+     
+
+        AddressBuffer_ = (char*)MapViewOfFile(hMapFile1,   // handle to map object
+            FILE_MAP_ALL_ACCESS, // read/write permission
+            0,
+            0,
+            SuperSize);
+
+        while (*AddressBuffer_!='\0')
+        {
+            Structs_enum invalid = Structs_enum::INVALID;
+            memcpy_s(&invalid, sizeof(Structs_enum), AddressBuffer_, sizeof(Structs_enum));
+            AddressBuffer_ += sizeof(Structs_enum);
+
+            if (invalid!= Structs_enum::INVALID)
+            {
+               
+                memcpy_s(cf, sizeof(Address), AddressBuffer_, sizeof(Address));
+
+
+
+                auto f = (T****)cf;
+                
+                cout << "f";
+            }
+            AddressBuffer_ += sizeof(T);
+
+        }
+
 
 
 

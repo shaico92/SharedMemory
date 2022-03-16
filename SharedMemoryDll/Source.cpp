@@ -142,7 +142,12 @@ void MemoryManager::AccessSharedMemory( std::string theNameForMem) {
         0,
         0,
         SuperSize);
-
+    int index = 0;
+    while (index<SuperSize)
+    {
+        AddressBuffer_[index] = '\0';
+        ++index;
+    }
 
     if (AddressBuffer_ == NULL)
     {
