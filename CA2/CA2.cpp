@@ -14,10 +14,24 @@
 int main()
 {
 
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
     MemoryManager mem;
     mem.AccessSharedMemory("fff");
 
-
+    auto fc = mem.GetAllElements<Wawa>(Structs_enum::Wawa_);
 
      Wawa obj;
      obj.s = 51;
@@ -47,15 +61,29 @@ int main()
 
 
      mem.AddToBuffer<Wawa>(obj, Structs_enum::Wawa_);
-
-     mem.AddToBuffer<Wawa>(obj, Structs_enum::Wawa_);
-
+     obj.s = 41;
      mem.AddToBuffer<WithChars>(wc, Structs_enum::WithChars_t);
-     mem.AddToBuffer<Wawa2>(arr, 5,Structs_enum::Wawa_2);
-     mem.AddToBuffer<Wawa2>(typeTwo, Structs_enum::Wawa_2);
-     mem.AddToBuffer<Wawa>(obdj, Structs_enum::Wawa_);
-    auto tf= mem.GetAllElements<Wawa>(Structs_enum::Wawa_);
+     mem.AddToBuffer<Wawa>(obj, Structs_enum::Wawa_);
+        _gettc;
+     auto f=mem.GetAllElements<Wawa>(Structs_enum::Wawa_);
+      f = mem.GetAllElements<Wawa>(Structs_enum::Wawa_);
 
+
+
+
+      
+
+
+
+      while (true)
+      {
+
+      }
+    // mem.AddToBuffer<Wawa2>(arr, 5,Structs_enum::Wawa_2);
+    // mem.AddToBuffer<Wawa2>(typeTwo, Structs_enum::Wawa_2);
+    // mem.AddToBuffer<Wawa>(obdj, Structs_enum::Wawa_);
+    //auto tf= mem.GetAllElements<Wawa>(Structs_enum::Wawa_);
+    // tf = mem.GetAllElements<Wawa>(Structs_enum::Wawa_);
  
 
 }

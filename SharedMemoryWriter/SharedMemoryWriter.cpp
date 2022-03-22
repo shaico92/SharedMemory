@@ -3,13 +3,15 @@
 
 #include <iostream>
 #include "../structs_lib/SmthingElse.h"
+#include "../structs_lib/temp.h"
+#include "../structs_lib/temp2.h"
 #include <Header.h>
 int main()
 {
 
     MemoryManager mem;
     mem.AccessSharedMemory("fff");
-
+    auto htf = mem.GetAllElements<Wawa>(Structs_enum::Wawa_);
     //auto pointerFromSharedMem = mem.printObjectsOfTypePtr<WithChars>(WithChars_t);
 
     //for (size_t i = 0; i < pointerFromSharedMem.size(); i++)
